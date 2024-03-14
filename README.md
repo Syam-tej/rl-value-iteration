@@ -1,98 +1,61 @@
-# <p align="center">VALUE ITERATION ALGORITHM</p>
+# VALUE ITERATION ALGORITHM
 
-## AIM
-To develop a Python program to find the optimal policy for the given MDP using the value iteration algorithm.
+## AIM:
+To find an optimal policy for an agent navigating a grid-world with slippery tiles, aiming to reach a goal state while maximizing expected rewards using value iteration algorithm.
 
-## PROBLEM STATEMENT
-The FrozenLake environment in OpenAI Gym is a gridworld problem that challenges reinforcement learning agents to navigate a slippery terrain to reach a goal state while avoiding hazards. Note that the environment is closed with a fence, so the agent cannot leave the gridworld.
+## PROBLEM STATEMENT:
+The problem involves using the Value Iteration algorithm to find the best strategy for an agent in the Frozen Lake environment. The agent must navigate icy terrain, avoid hazards, and reach the goal while optimizing cumulative rewards in an uncertain environment.
 
-### States
-- **5 Terminal States**:
-  - `G` (Goal): The state the agent aims to reach.
-  - `H` (Hole): A hazardous state that the agent must avoid at all costs.
-- **11 Non-terminal States**:
-  - `S` (Starting state): The initial position of the agent.
-  - Intermediate states: Grid cells forming a layout that the agent must traverse.
+## POLICY ITERATION ALGORITHM:
+**Environment Setup:**
+- The code begins by importing necessary libraries and setting up the Frozen Lake environment using Gym. It also initializes the initial state, goal state, and transition probabilities (P).
 
-### Actions
-The agent can take 4 actions in each state:
-- `LEFT`
-- `RIGHT`
-- `UP`
-- `DOWN`
+**Value Iteration Algorithm:**
+- The core algorithm used in this code is Value Iteration.
+**Value Initialization:**
+- Initialize a value function (V) with zeros for each state.
+**Value Iteration Loop:**
+- For each state (s), calculate the Q-values for all possible actions (a) using the Bellman equation. The Q-value represents the expected cumulative reward when taking action 'a' from state 's'.
+- Update the value function (V) by taking the maximum Q-value for each state.
+- Check for convergence: If the maximum change in value function (V) is smaller than a threshold (theta), break the loop.
+- After convergence, derive the optimal policy (pi) by selecting actions that maximize the Q-values.
+**Results:**
+- The code prints the optimal policy, its state-value function, the success rate of reaching the goal, and the mean undiscounted return of the optimal policy.
 
-### Transition Probabilities
-The environment is stochastic, meaning that the outcome of an action is not always certain.
-- **33.33%** chance of moving in the intended direction.
-- **66.66%** chance of moving in a orthogonal directions.
-
-This uncertainty adds complexity to the agent's navigation.
-
-### Rewards
-- `+1` for reaching the goal state(G).
-- 0 reward for all other states, including the starting state (S) and intermediate states.
-
-### Episode Termination
-The episode terminates when the agent reaches the goal state (G) or falls into a hole (H).
-
-### Graphical Representation
-<img src="https://github.com/ShafeeqAhamedS/RL_Exp_4_Value-Iteration/assets/93427237/cd014ae8-4bb3-45f6-838d-b39d4ef80582">
-
-## VALUE ITERATION ALGORITHM
- - Value iteration is a method of computing an optimal MDP policy and its value.
- - It begins with an initial guess for the value function, and iteratively updates it towards the optimal value function, according to the Bellman optimality equation. 
-  - The algorithm is guaranteed to converge to the optimal value function, and in the process of doing so, also converges to the optimal policy.
-
-The algorithm is as follows:
-1. Initialize the value function V(s) arbitrarily for all states s.
-2. Repeat until convergence:
-   - Initialize aaction-value function Q(s, a) arbitrarily for all states s and actions a.
-   - For all the states s and all the action a of every state:
-     - Update the action-value function Q(s, a) using the Bellman equation.
-     - Take the value function V(s) to be the maximum of Q(s, a) over all actions a.
-     - Check if the maximum difference between Old V and new V is less than theta.
-     - Where theta is a small positive number that determines the accuracy of estimation.
-3. If the maximum difference between Old V and new V is greater than theta, then 
-    - Update the value function V with the maximum action-value from Q.
-    - Go to step 2.
-4. The optimal policy can be constructed by taking the argmax of the action-value function Q(s, a) over all actions a.
-5. Return the optimal policy and the optimal value function.
-
-## VALUE ITERATION FUNCTION
+## VALUE ITERATION FUNCTION:
 ```
-DEVELOPED BY : P SYAM TEJ
-REF NO : 212221240056
+Developed By: P SYAM TEJ
+Reg.No: 212221240056
 ```
-```python
+```python3
+desc=['FFSH','FFFH','GFHF','HFFH']
+env = gym.make('FrozenLake-v1',desc=desc)
+init_state = env.reset()
+goal_state = 8
+P = env.env.P
+```
+```python3
 def value_iteration(P, gamma=1.0, theta=1e-10):
-    # Initialize the value function V as an array of zeros
     V = np.zeros(len(P), dtype=np.float64)
-    
     while True:
-        # Initialize the action-value function Q as an array of zeros
-        Q = np.zeros((len(P), len(P[0])), dtype=np.float64)
-        
-        for s in range(len(P)):
-            for a in range(len(P[s])):
-                for prob, next_state, reward, done in P[s][a]:
-                    # Update the action-value function Q using the Bellman equation
-                    Q[s][a] += prob * (reward + gamma * V[next_state] * (not done))
-        
-        # Check if the maximum difference between Old V and new V is less than theta.
-        if np.max(np.abs(V - np.max(Q, axis=1))) < theta:
-            break
-        
-        # Update the value function V with the maximum action-value from Q
-        V = np.max(Q, axis=1)
-
-    # Compute the policy pi based on the action-value function Q
-    pi = lambda s: {s: a for s, a in enumerate(np.argmax(Q, axis=1))}[s]
-    
+      Q=np.zeros((len(P),len(P[0])),dtype=np.float64)
+      for s in range(len(P)):
+        for a in range(len(P[s])):
+          for prob,next_state,reward,done in P[s][a]:
+            Q[s][a]+=prob*(reward+gamma*V[next_state]*(not done))
+      if np.max(np.abs(V-np.max(Q,axis=1)))<theta:
+        break
+      V=np.max(Q,axis=1)
+    pi=lambda s:{s:a for s,a in enumerate(np.argmax(Q,axis=1))}[s]
     return V, pi
 ```
 
 ## OUTPUT:
-![image](https://github.com/Prasannakumar019/rl-value-iteration/assets/75235090/49037c86-c508-4675-9570-d404cf9c490e)
+<img width="443" alt="1" src="https://github.com/saieswar1607/rl-value-iteration/assets/93427011/775d8589-0378-4be3-954c-a6f81ff65a68">
+<br>
+<img width="607" alt="2" src="https://github.com/saieswar1607/rl-value-iteration/assets/93427011/a44f6ff1-f20c-449e-9e50-266f95547e26">
+<br>
+<img width="430" alt="3" src="https://github.com/saieswar1607/rl-value-iteration/assets/93427011/af34f343-fe04-42ac-baba-846afa7f4ead">
 
 ## RESULT:
-Thus, a Python program is developed to find the optimal policy for the given MDP using the value iteration algorithm.
+Thus, an optimal policy for an agent navigating a grid-world with slippery tiles, aiming to reach a goal state while maximizing expected rewards using value iteration algorithm is successfully implemented.
